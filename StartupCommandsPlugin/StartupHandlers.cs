@@ -1,7 +1,6 @@
 namespace FfxivStartupCommands
 {
     using System;
-    using FFXIVClientStructs.Component.GUI;
 
 
     public class StartupHandlers : IDisposable
@@ -38,6 +37,15 @@ namespace FfxivStartupCommands
         #endregion
 
 
+        public void ChangeChatChannel()
+        {
+            if (Plugin.Configuration.DefaultChatChannel == ChatChannel.None)
+                return;
+            
+            Plugin.GameClient.ProcessChatBox(Plugin.Configuration.DefaultChatChannel.ToCommand());
+        }
+
+
         public void Dispose()
         {
             if (this.WaitingForChatThread != null)
@@ -59,19 +67,12 @@ namespace FfxivStartupCommands
             this.WaitingForChatThread = ThreadLoop.Start(
                 action: (threadLoop) =>
                     {
-                        if (Plugin.Dalamud.ClientState.LocalPlayer != null)
+                        if (Plugin.GameClient.ChatIsVisible())
                         {
-                            AtkUnitBase* chatLog = (AtkUnitBase*)Plugin.Dalamud.Framework.Gui.GetUiObjectByName("ChatLog", 1);
-                            if (chatLog != null) 
-                            {
-                                if (chatLog->IsVisible == true)
-                                {
-                                    this.chatReady = true;
-                                    OnChatReady();
-                                    threadLoop.Stop();
-                                    this.WaitingForChatThread = null;
-                                }
-                            }    
+                            this.chatReady = true;
+                            OnChatReady();
+                            threadLoop.Stop();
+                            this.WaitingForChatThread = null;
                         }
                     }, interval: 250);
         }
@@ -90,10 +91,21 @@ namespace FfxivStartupCommands
 
         public void RunCommands()
         {
-            Plugin.LogToChat("Executing startup commands.");
-            foreach (string command in Plugin.Configuration.ChatCommands)
+            if (!Plugin.Configuration.HasCommands)
+                return;
+            
+            Plugin.LogToChat("Performing startup behaviors.");
+            
+            ChangeChatChannel();
+            RunCustomCommands();
+        }
+
+
+        private static void RunCustomCommands()
+        {
+            foreach (Configuration.CustomCommand customCommand in Plugin.Configuration.CustomCommands)
             {
-                Plugin.GameClient.ProcessChatBox(command);
+                Plugin.GameClient.ProcessChatBox(customCommand.Command);
             }
         }
 

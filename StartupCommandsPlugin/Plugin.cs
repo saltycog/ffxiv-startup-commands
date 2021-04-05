@@ -27,7 +27,7 @@
         /// </summary>
         public static Configuration Configuration
         {
-            get { return _instance.configuration; }
+            get { return Instance.configuration; }
         }
 
         /// <summary>
@@ -35,7 +35,7 @@
         /// </summary>
         public static DalamudPluginInterface Dalamud
         {
-            get { return _instance.dalamud; }
+            get { return Instance.dalamud; }
         }
 
         /// <summary>
@@ -43,7 +43,7 @@
         /// </summary>
         public static GameClient GameClient
         {
-            get { return _instance.gameClient; }
+            get { return Instance.gameClient; }
         }
 
         /// <summary>
@@ -51,7 +51,7 @@
         /// </summary>
         public static StartupHandlers StartupHandlers
         {
-            get { return _instance.startupHandlers; }
+            get { return Instance.startupHandlers; }
         }
 
         /// <summary>
@@ -59,7 +59,10 @@
         /// </summary>
         public static PluginUI UI
         {
-            get { return _instance.ui; }
+            get
+            {
+                return Instance.ui;
+            }
         }
 
         /// <summary>
@@ -72,7 +75,14 @@
         /// </summary>
         private static Plugin Instance
         {
-            get { return _instance; }
+            get
+            {
+                if (_instance == null)
+                {
+                    _instance = new Plugin();
+                }
+                return _instance;
+            }
         }
         #endregion
 
@@ -105,11 +115,15 @@
             _instance = this;
             
             this.dalamud = pluginInterface;
+
+            if (this.dalamud != null)
+                this.configuration = this.dalamud.GetPluginConfig() as Configuration ?? new Configuration();    
+            else
+                this.configuration = new Configuration();
             
-            this.configuration = this.dalamud.GetPluginConfig() as Configuration ?? new Configuration();
             this.configuration.Initialize(this.dalamud);
             
-            this.ui = new PluginUI(this);
+            this.ui = new PluginUI();
             
             this.startupHandlers = new StartupHandlers();
             this.gameClient = new GameClient();
@@ -136,14 +150,17 @@
             this.dalamud.CommandManager.AddHandler(
                 mainCommandName,
                 new CommandInfo(OnCommand)
-                    {
-                        HelpMessage = "A useful message to display in /xlhelp"
+                    { 
+                        HelpMessage = "Open configuration for Startup Commands to perform behaviors upon character login."
                     });
         }
 
 
         private void RegisterHooks()
         {
+            if (this.dalamud == null)
+                return;
+            
             RegisterCommandHooks();
             RegisterStartupHooks();
             RegisterUIHooks();

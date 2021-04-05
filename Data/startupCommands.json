@@ -1,11 +1,11 @@
 {
   "Author": "SaltyCog",
   "Name": "Startup Commands",
-  "Description": "Executes commands right after logging in with a character.",
   "InternalName": "StartupCommands",
-  "AssemblyVersion": "1.0.0.1",
-  "RepoUrl": "https://github.com/zallenwhite/ffxiv-startup-commands-plugin",
+  "Description": "Perform various behaviors/commands right after logging into a character.",
+  "AssemblyVersion": "1.0.0.0",
+  "RepoUrl": "https://github.com/saltycog/ffxiv-startup-commands",
   "ApplicableVersion": "any",
-  "Tags": ["startup", "login", "commands"],
+  "Tags": ["startup", "login", "commands", "chat"],
   "DalamudApiLevel": 2
 }

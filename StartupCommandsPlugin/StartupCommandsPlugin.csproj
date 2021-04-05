@@ -59,6 +59,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="ChatChannel.cs" />
     <Compile Include="Configuration.cs" />
     <Compile Include="GameClient.cs" />
     <Compile Include="Plugin.cs" />
@@ -66,7 +67,6 @@
     <Compile Include="StartupHandlers.cs" />
     <Compile Include="ThreadLoop.cs" />
     <Compile Include="UI\ConfigWindow.cs" />
-    <Compile Include="UI\DebugWindow.cs" />
     <Compile Include="UI\PluginUI.cs" />
     <Compile Include="UI\UIWindow.cs" />
   </ItemGroup>

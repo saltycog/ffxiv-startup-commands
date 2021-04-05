@@ -4,6 +4,7 @@ namespace FfxivStartupCommands
     using System.Diagnostics.CodeAnalysis;
     using System.Runtime.InteropServices;
     using System.Text;
+    using FFXIVClientStructs.Component.GUI;
 
 
     public class GameClient
@@ -16,8 +17,11 @@ namespace FfxivStartupCommands
         private delegate IntPtr GetUiModuleDelegate(IntPtr basePtr);
 
 
-        public GameClient() 
+        public GameClient()
         {
+            if (Plugin.Dalamud == null)
+                return;
+            
             IntPtr getUiModulePtr = Plugin.Dalamud.TargetModuleScanner.ScanText("E8 ?? ?? ?? ?? 48 83 7F ?? 00 48 8B F0");
             IntPtr easierProcessChatBoxPtr = Plugin.Dalamud.TargetModuleScanner.ScanText("48 89 5C 24 ?? 57 48 83 EC 20 48 8B FA 48 8B D9 45 84 C9");
             this.uiModulePtr = Plugin.Dalamud.TargetModuleScanner.GetStaticAddressFromSig("48 8B 0D ?? ?? ?? ?? 48 8D 54 24 ?? 48 83 C1 10 E8 ?? ?? ?? ??");
@@ -26,6 +30,22 @@ namespace FfxivStartupCommands
             this.easierProcessChatBox = Marshal.GetDelegateForFunctionPointer<EasierProcessChatBoxDelegate>(easierProcessChatBoxPtr);
         }
 
+
+        /// <summary>
+        /// Returns whether the Chat window is visible. 
+        /// </summary>
+        public unsafe bool ChatIsVisible()
+        {
+            if (Plugin.Dalamud.ClientState.LocalPlayer != null)
+            {
+                AtkUnitBase* chatLog = (AtkUnitBase*)Plugin.Dalamud.Framework.Gui.GetUiObjectByName("ChatLog", 1);
+                
+                if (chatLog != null)
+                    return chatLog->IsVisible;
+            }
+
+            return false;
+        }
 
         public void ProcessChatBox(string message) 
         {

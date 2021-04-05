@@ -12,7 +12,7 @@
 
         private PluginUITest()
         {
-            this.pluginUI = new PluginUI(new Plugin());
+            this.pluginUI = new PluginUI();
         }
 
 
@@ -33,7 +33,7 @@
             scene.OnBuildUI += Draw;
 
             this.scene = scene;
-            this.pluginUI.DebugWindow.Show();
+            this.pluginUI.ConfigWindow.Show();
         }
 
 
@@ -42,7 +42,7 @@
             this.pluginUI.Draw();
 
             // Quit UI test when windows is closed.
-            if (!this.pluginUI.DebugWindow.IsVisible)
+            if (!this.pluginUI.ConfigWindow.IsVisible)
             {
                 this.scene.ShouldQuit = true;
             }
