@@ -9,7 +9,7 @@
 
     internal class UIBootstrap
     {
-        public static unsafe void Inititalize(IPluginUIMock pluginUI)
+        public static unsafe void Initialize(IPluginUIMock pluginUI)
         {
             using (SimpleImGuiScene scene = new SimpleImGuiScene(RendererFactory.RendererBackend.DirectX11, new WindowCreateInfo
             {

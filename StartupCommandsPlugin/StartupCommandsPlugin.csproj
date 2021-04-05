@@ -7,11 +7,12 @@
     <ProjectGuid>{13C812E9-0D42-4B95-8646-40EEBF30636F}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>SamplePlugin</RootNamespace>
-    <AssemblyName>samplePlugin</AssemblyName>
+    <RootNamespace>FfxivStartupCommands</RootNamespace>
+    <AssemblyName>StartupCommands</AssemblyName>
     <TargetFrameworkVersion>v4.7.2</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <Deterministic>true</Deterministic>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -43,6 +44,10 @@
       <HintPath>$(AppData)\XIVLauncher\addon\Hooks\dev\ImGuiScene.dll</HintPath>
       <Private>False</Private>
     </Reference>
+    <Reference Include="FFXIVClientStructs">
+      <HintPath>$(AppData)\XIVLauncher\addon\Hooks\dev\FFXIVClientStructs.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Numerics" />
@@ -55,17 +60,19 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Configuration.cs" />
+    <Compile Include="GameClient.cs" />
     <Compile Include="Plugin.cs" />
-    <Compile Include="PluginUI.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="StartupHandlers.cs" />
+    <Compile Include="ThreadLoop.cs" />
+    <Compile Include="UI\ConfigWindow.cs" />
+    <Compile Include="UI\DebugWindow.cs" />
+    <Compile Include="UI\PluginUI.cs" />
+    <Compile Include="UI\UIWindow.cs" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="..\Data\startupCommands.json">
+    <Content Include="..\Data\StartupCommands.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="..\Data\goat.png">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-      <Visible>false</Visible>
     </Content>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

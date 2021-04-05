@@ -3,8 +3,9 @@
     using Dalamud.Configuration;
     using Dalamud.Plugin;
     using System;
-    
-    
+    using System.Collections.Generic;
+
+
     [Serializable]
     public class Configuration : IPluginConfiguration
     {
@@ -13,7 +14,11 @@
 
 
         #region Properties
-        public bool SomePropertyToBeSavedAndWithADefault { get; set; } = true;
+        /// <summary>
+        /// Arbitrary chat commands to be executed upon successful character login.
+        /// </summary>
+        public List<string> ChatCommands { get; set; } = new List<string>();
+        
         public int Version { get; set; } = 0;
         #endregion
 

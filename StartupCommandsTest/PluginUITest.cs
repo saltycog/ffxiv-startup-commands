@@ -5,7 +5,6 @@
     
     internal class PluginUITest : IPluginUIMock
     {
-        private TextureWrap goatImage;
         private SimpleImGuiScene scene;
 
         private readonly PluginUI pluginUI;
@@ -13,13 +12,13 @@
 
         private PluginUITest()
         {
-            this.pluginUI = new PluginUI(new Configuration());
+            this.pluginUI = new PluginUI(new Plugin());
         }
 
 
         public static void Main(string[] args)
         {
-            UIBootstrap.Inititalize(new PluginUITest());
+            UIBootstrap.Initialize(new PluginUITest());
         }
 
 
@@ -34,7 +33,7 @@
             scene.OnBuildUI += Draw;
 
             this.scene = scene;
-            this.pluginUI.Visible = true;
+            this.pluginUI.DebugWindow.Show();
         }
 
 
@@ -43,7 +42,7 @@
             this.pluginUI.Draw();
 
             // Quit UI test when windows is closed.
-            if (!this.pluginUI.Visible)
+            if (!this.pluginUI.DebugWindow.IsVisible)
             {
                 this.scene.ShouldQuit = true;
             }
