@@ -11,7 +11,9 @@ Requires [FFXIV Quick Launcher](https://github.com/goatcorp/FFXIVQuickLauncher)
 `/startup` in the chat box to bring up the configuration panel.
 
 From here, you can select a default chat channel (None to keep FFXIV's default behavior), as well as enter custom chat commands.
-Order of command execution cannot be guaranteed at the moment.
+Order of command execution cannot be guaranteed at the moment, and there is no delay between commands (perhaps in a future update).
+
+Use the `Execute Now` button to test your setup.
 
 ## Installation Instructions
 * Open the plugin settings window by entering `/xlplugins` in the FFXIV chat window.
