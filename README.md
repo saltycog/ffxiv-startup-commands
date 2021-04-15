@@ -1,15 +1,19 @@
 # FFXIV Startup Commands
 An FFXIV plugin for performing custom commands and behaviors upon logging into a character.
 
+![Config](config.png)
+
 Includes the option to change starting chat channel, because we're all tired of blasting Novice Net with personal messages by accident.
 
-Requires [FFXIV Quick Launcher](https://github.com/goatcorp/FFXIVQuickLauncher)
+Requires [XIVLauncher](https://github.com/goatcorp/FFXIVQuickLauncher)
 
 ## Usage
 `/startup` in the chat box to bring up the configuration panel.
 
 From here, you can select a default chat channel (None to keep FFXIV's default behavior), as well as enter custom chat commands.
-Order of command execution cannot be guaranteed at the moment.
+Order of command execution cannot be guaranteed at the moment, and there is no delay between commands (perhaps in a future update).
+
+Use the `Execute Now` button to test your setup.
 
 ## Installation Instructions
 * Open the plugin settings window by entering `/xlplugins` in the FFXIV chat window.
