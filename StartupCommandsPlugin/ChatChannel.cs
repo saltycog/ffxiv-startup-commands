@@ -6,8 +6,6 @@ namespace FfxivStartupCommands
         Say,
         Yell,
         Shout,
-        Tell,
-        Reply,
         Party,
         Alliance,
         FreeCompany,
@@ -28,8 +26,7 @@ namespace FfxivStartupCommands
         CrossworldLinkshell7,
         CrossworldLinkshell8,
         NoviceNetwork,
-        PvPTeam,
-        Echo
+        PvPTeam
     }
 
 
@@ -45,10 +42,6 @@ namespace FfxivStartupCommands
                     return "/yell";
                 case ChatChannel.Shout:
                     return "/shout";
-                case ChatChannel.Tell:
-                    return "/tell";
-                case ChatChannel.Reply:
-                    return "/reply";
                 case ChatChannel.Party:
                     return "/party";
                 case ChatChannel.Alliance:
@@ -91,8 +84,6 @@ namespace FfxivStartupCommands
                     return "/novice";
                 case ChatChannel.PvPTeam:
                     return "/pvpteam";
-                case ChatChannel.Echo:
-                    return "/echo";
             }
             
             return string.Empty;
@@ -108,10 +99,6 @@ namespace FfxivStartupCommands
                     return "Yell";
                 case ChatChannel.Shout:
                     return "Shout";
-                case ChatChannel.Tell:
-                    return "Tell";
-                case ChatChannel.Reply:
-                    return "Reply";
                 case ChatChannel.Party:
                     return "Party";
                 case ChatChannel.Alliance:
@@ -154,8 +141,6 @@ namespace FfxivStartupCommands
                     return "Novice Network";
                 case ChatChannel.PvPTeam:
                     return "PvP Team";
-                case ChatChannel.Echo:
-                    return "Echo";
             }
 
             return "None";

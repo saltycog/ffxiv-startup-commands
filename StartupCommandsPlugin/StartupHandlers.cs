@@ -37,15 +37,6 @@ namespace FfxivStartupCommands
         #endregion
 
 
-        public void ChangeChatChannel()
-        {
-            if (Plugin.Configuration.DefaultChatChannel == ChatChannel.None)
-                return;
-            
-            Plugin.GameClient.ProcessChatBox(Plugin.Configuration.DefaultChatChannel.ToCommand());
-        }
-
-
         public void Dispose()
         {
             if (this.WaitingForChatThread != null)
@@ -56,6 +47,9 @@ namespace FfxivStartupCommands
         }
 
 
+        /// <summary>
+        /// Executed upon successful character login.
+        /// </summary>
         public unsafe void OnLogin(object sender, EventArgs args)
         {
             if (this.chatReady
@@ -67,7 +61,7 @@ namespace FfxivStartupCommands
             this.WaitingForChatThread = ThreadLoop.Start(
                 action: (threadLoop) =>
                     {
-                        if (Plugin.GameClient.ChatIsVisible())
+                        if (Plugin.GameClient.GetChatVisible())
                         {
                             this.chatReady = true;
                             OnChatReady();
@@ -89,14 +83,14 @@ namespace FfxivStartupCommands
         }
 
 
-        public void RunCommands()
+        public void RunStartupBehaviors()
         {
             if (!Plugin.Configuration.HasCommands)
                 return;
             
             Plugin.LogToChat("Performing startup behaviors.");
             
-            ChangeChatChannel();
+            Plugin.GameClient.ChangeChatChannel();
             RunCustomCommands();
         }
 
@@ -105,14 +99,14 @@ namespace FfxivStartupCommands
         {
             foreach (Configuration.CustomCommand customCommand in Plugin.Configuration.CustomCommands)
             {
-                Plugin.GameClient.ProcessChatBox(customCommand.Command);
+                Plugin.GameClient.SubmitToChat(customCommand.Command);
             }
         }
 
 
         private void OnChatReady()
         {
-            RunCommands();
+            RunStartupBehaviors();
         }
     }
 }

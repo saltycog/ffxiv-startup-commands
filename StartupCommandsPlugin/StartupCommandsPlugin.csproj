@@ -60,6 +60,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="ChatChannel.cs" />
+    <Compile Include="ChatPayload.cs" />
     <Compile Include="Configuration.cs" />
     <Compile Include="GameClient.cs" />
     <Compile Include="Plugin.cs" />

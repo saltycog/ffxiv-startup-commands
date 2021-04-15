@@ -63,7 +63,7 @@ namespace FfxivStartupCommands
         {
             if (ImGui.Button("Execute Now"))
             {
-                Plugin.StartupHandlers.RunCommands();
+                Plugin.StartupHandlers.RunStartupBehaviors();
             }
             if (ImGui.IsItemHovered())
             {

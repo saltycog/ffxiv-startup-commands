@@ -1,19 +1,17 @@
 namespace FfxivStartupCommands
 {
     using System;
-    using System.Diagnostics.CodeAnalysis;
     using System.Runtime.InteropServices;
-    using System.Text;
     using FFXIVClientStructs.Component.GUI;
 
 
     public class GameClient
     {
-        private readonly GetUiModuleDelegate getUiModule;
-        private readonly EasierProcessChatBoxDelegate easierProcessChatBox;
-        private readonly IntPtr uiModulePtr;
+        private readonly GetUiModuleDelegate getUI;
+        private readonly GetChatBoxModuleDelegate getChatBox;
+        private readonly IntPtr uiModulePointer;
 
-        private delegate void EasierProcessChatBoxDelegate(IntPtr uiModule, IntPtr message, IntPtr unused, byte a4);
+        private delegate void GetChatBoxModuleDelegate(IntPtr uiModule, IntPtr message, IntPtr unused, byte a4);
         private delegate IntPtr GetUiModuleDelegate(IntPtr basePtr);
 
 
@@ -22,19 +20,21 @@ namespace FfxivStartupCommands
             if (Plugin.Dalamud == null)
                 return;
             
-            IntPtr getUiModulePtr = Plugin.Dalamud.TargetModuleScanner.ScanText("E8 ?? ?? ?? ?? 48 83 7F ?? 00 48 8B F0");
-            IntPtr easierProcessChatBoxPtr = Plugin.Dalamud.TargetModuleScanner.ScanText("48 89 5C 24 ?? 57 48 83 EC 20 48 8B FA 48 8B D9 45 84 C9");
-            this.uiModulePtr = Plugin.Dalamud.TargetModuleScanner.GetStaticAddressFromSig("48 8B 0D ?? ?? ?? ?? 48 8D 54 24 ?? 48 83 C1 10 E8 ?? ?? ?? ??");
-
-            this.getUiModule = Marshal.GetDelegateForFunctionPointer<GetUiModuleDelegate>(getUiModulePtr);
-            this.easierProcessChatBox = Marshal.GetDelegateForFunctionPointer<EasierProcessChatBoxDelegate>(easierProcessChatBoxPtr);
+            // Get UI module.
+            IntPtr getUiModulePointer = Plugin.Dalamud.TargetModuleScanner.ScanText("E8 ?? ?? ?? ?? 48 83 7F ?? 00 48 8B F0");
+            this.uiModulePointer = Plugin.Dalamud.TargetModuleScanner.GetStaticAddressFromSig("48 8B 0D ?? ?? ?? ?? 48 8D 54 24 ?? 48 83 C1 10 E8 ?? ?? ?? ??");
+            this.getUI = Marshal.GetDelegateForFunctionPointer<GetUiModuleDelegate>(getUiModulePointer);
+            
+            // Get chat box module.
+            IntPtr chatBoxModulePointer = Plugin.Dalamud.TargetModuleScanner.ScanText("48 89 5C 24 ?? 57 48 83 EC 20 48 8B FA 48 8B D9 45 84 C9");
+            this.getChatBox = Marshal.GetDelegateForFunctionPointer<GetChatBoxModuleDelegate>(chatBoxModulePointer);
         }
 
 
         /// <summary>
-        /// Returns whether the Chat window is visible. 
+        /// Returns whether the Chat window is visible (and thus interactable). 
         /// </summary>
-        public unsafe bool ChatIsVisible()
+        public unsafe bool GetChatVisible()
         {
             if (Plugin.Dalamud.ClientState.LocalPlayer != null)
             {
@@ -46,55 +46,40 @@ namespace FfxivStartupCommands
 
             return false;
         }
-
-        public void ProcessChatBox(string message) 
+        
+        
+        /// <summary>
+        /// Convenience function to change active chat channel.
+        /// </summary>
+        public void ChangeChatChannel()
         {
-            IntPtr uiModule = this.getUiModule(Marshal.ReadIntPtr(this.uiModulePtr));
+            if (Plugin.Configuration.DefaultChatChannel == ChatChannel.None)
+                return;
+            
+            Plugin.GameClient.SubmitToChat(Plugin.Configuration.DefaultChatChannel.ToCommand());
+        }
 
-            using (ChatPayload payload = new ChatPayload(message))
+
+        /// <summary>
+        /// Submit text/command to outgoing chat.
+        /// Can be used to enter chat commands.
+        /// </summary>
+        /// <param name="text">Text to submit.</param>
+        public void SubmitToChat(string text) 
+        {
+            IntPtr uiModule = this.getUI(Marshal.ReadIntPtr(this.uiModulePointer));
+
+            using (ChatPayload payload = new ChatPayload(text))
             {
                 IntPtr mem1 = Marshal.AllocHGlobal(400);
                 Marshal.StructureToPtr(payload, mem1, false);
 
-                this.easierProcessChatBox(uiModule, mem1, IntPtr.Zero, 0);
+                this.getChatBox(uiModule, mem1, IntPtr.Zero, 0);
 
                 Marshal.FreeHGlobal(mem1);    
             }
         }
     }
 
-    [StructLayout(LayoutKind.Explicit)]
-    [SuppressMessage("ReSharper", "PrivateFieldCanBeConvertedToLocalVariable")]
-    internal readonly struct ChatPayload : IDisposable 
-    {
-        [FieldOffset(0)]
-        private readonly IntPtr textPtr;
-
-        [FieldOffset(16)]
-        private readonly ulong textLen;
-
-        [FieldOffset(8)]
-        private readonly ulong unk1;
-
-        [FieldOffset(24)]
-        private readonly ulong unk2;
-
-        internal ChatPayload(string text) 
-        {
-            byte[] stringBytes = Encoding.UTF8.GetBytes(text);
-            this.textPtr = Marshal.AllocHGlobal(stringBytes.Length + 30);
-            Marshal.Copy(stringBytes, 0, this.textPtr, stringBytes.Length);
-            Marshal.WriteByte(this.textPtr + stringBytes.Length, 0);
-
-            this.textLen = (ulong) (stringBytes.Length + 1);
-
-            this.unk1 = 64;
-            this.unk2 = 0;
-        }
-
-        public void Dispose() 
-        {
-            Marshal.FreeHGlobal(this.textPtr);
-        }
-    }
+    
 }
