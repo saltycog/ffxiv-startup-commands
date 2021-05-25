@@ -2,7 +2,7 @@ namespace FfxivStartupCommands
 {
     using System;
     using System.Runtime.InteropServices;
-    using FFXIVClientStructs.Component.GUI;
+    using FFXIVClientStructs.FFXIV.Component.GUI;
 
 
     public class GameClient
@@ -14,7 +14,7 @@ namespace FfxivStartupCommands
         private delegate void GetChatBoxModuleDelegate(IntPtr uiModule, IntPtr message, IntPtr unused, byte a4);
         private delegate IntPtr GetUiModuleDelegate(IntPtr basePtr);
 
-
+        
         public GameClient()
         {
             if (Plugin.Dalamud == null)
