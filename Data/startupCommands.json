@@ -3,9 +3,10 @@
   "Name": "Startup Commands",
   "InternalName": "StartupCommands",
   "Description": "Perform various behaviors/commands right after logging into a character.",
-  "AssemblyVersion": "1.0.2.0",
+  "AssemblyVersion": "1.0.3.0",
   "RepoUrl": "https://github.com/saltycog/ffxiv-startup-commands",
+  "IconUrl": "https://github.com/saltycog/ffxiv-startup-commands/raw/master/icon.png",
   "ApplicableVersion": "any",
   "Tags": ["startup", "login", "commands", "chat"],
-  "DalamudApiLevel": 3
+  "DalamudApiLevel": 4
 }

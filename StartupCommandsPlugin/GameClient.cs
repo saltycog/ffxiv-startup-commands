@@ -17,16 +17,16 @@ namespace FfxivStartupCommands
         
         public GameClient()
         {
-            if (Plugin.Dalamud == null)
+            if (Plugin.PluginInterface == null)
                 return;
             
             // Get UI module.
-            IntPtr getUiModulePointer = Plugin.Dalamud.TargetModuleScanner.ScanText("E8 ?? ?? ?? ?? 48 83 7F ?? 00 48 8B F0");
-            this.uiModulePointer = Plugin.Dalamud.TargetModuleScanner.GetStaticAddressFromSig("48 8B 0D ?? ?? ?? ?? 48 8D 54 24 ?? 48 83 C1 10 E8 ?? ?? ?? ??");
+            IntPtr getUiModulePointer = Plugin.TargetModuleScanner.ScanText("E8 ?? ?? ?? ?? 48 83 7F ?? 00 48 8B F0");
+            this.uiModulePointer = Plugin.TargetModuleScanner.GetStaticAddressFromSig("48 8B 0D ?? ?? ?? ?? 48 8D 54 24 ?? 48 83 C1 10 E8 ?? ?? ?? ??");
             this.getUI = Marshal.GetDelegateForFunctionPointer<GetUiModuleDelegate>(getUiModulePointer);
             
             // Get chat box module.
-            IntPtr chatBoxModulePointer = Plugin.Dalamud.TargetModuleScanner.ScanText("48 89 5C 24 ?? 57 48 83 EC 20 48 8B FA 48 8B D9 45 84 C9");
+            IntPtr chatBoxModulePointer = Plugin.TargetModuleScanner.ScanText("48 89 5C 24 ?? 57 48 83 EC 20 48 8B FA 48 8B D9 45 84 C9");
             this.getChatBox = Marshal.GetDelegateForFunctionPointer<GetChatBoxModuleDelegate>(chatBoxModulePointer);
         }
 
@@ -36,9 +36,9 @@ namespace FfxivStartupCommands
         /// </summary>
         public unsafe bool GetChatVisible()
         {
-            if (Plugin.Dalamud.ClientState.LocalPlayer != null)
+            if (Plugin.ClientState.LocalPlayer != null)
             {
-                AtkUnitBase* chatLog = (AtkUnitBase*)Plugin.Dalamud.Framework.Gui.GetUiObjectByName("ChatLog", 1);
+                AtkUnitBase* chatLog = (AtkUnitBase*)Plugin.GameGui.GetAddonByName("ChatLog", 1);
                 
                 if (chatLog != null)
                     return chatLog->IsVisible;

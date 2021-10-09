@@ -1,6 +1,10 @@
 ﻿namespace FfxivStartupCommands
 {
+    using Dalamud.Game;
+    using Dalamud.Game.ClientState;
     using Dalamud.Game.Command;
+    using Dalamud.Game.Gui;
+    using Dalamud.IoC;
     using Dalamud.Plugin;
 
 
@@ -14,7 +18,27 @@
 
         private static Plugin _instance;
 
-        private DalamudPluginInterface dalamud;
+        [PluginService]
+        public static DalamudPluginInterface PluginInterface { get; private set; }
+        
+        [PluginService]
+        public static CommandManager CommandManager { get; private set; }
+        
+        [PluginService]
+        public static ClientState ClientState { get; private set; }
+        
+        [PluginService]
+        public static Framework Framework { get; private set; }
+        
+        [PluginService]
+        public static ChatGui ChatGui { get; private set; }
+        
+        [PluginService]
+        public static GameGui GameGui { get; private set; }
+        
+        [PluginService]
+        public static SigScanner TargetModuleScanner { get; private set; }
+        
         private Configuration configuration = new Configuration();
         private GameClient gameClient;
         private StartupHandlers startupHandlers;
@@ -30,13 +54,7 @@
             get { return Instance.configuration; }
         }
 
-        /// <summary>
-        /// Dalamud plugin interface.
-        /// </summary>
-        public static DalamudPluginInterface Dalamud
-        {
-            get { return Instance.dalamud; }
-        }
+        
 
         /// <summary>
         /// Game client utility functions.
@@ -93,35 +111,36 @@
         /// <param name="text">Text to display in chat box.</param>
         public static void LogToChat(string text)
         {
-            Dalamud.Framework.Gui.Chat.Print(text);
+            ChatGui.Print(text);
         }
 
 
         public void Dispose()
         {
-            this.dalamud.CommandManager.RemoveHandler(mainCommandName);
-            this.dalamud.UiBuilder.OnBuildUi -= this.ui.Draw;
-            this.dalamud.ClientState.OnLogin -= this.startupHandlers.OnLogin;
-            this.dalamud.ClientState.OnLogout -= this.startupHandlers.OnLogout;
+            CommandManager.RemoveHandler(mainCommandName);
+            PluginInterface.UiBuilder.Draw -= this.ui.Draw;
+            
+            ClientState.Login -= this.startupHandlers.OnLogin;
+            ClientState.Logout -= this.startupHandlers.OnLogout;
             
             this.ui.Dispose();
             this.startupHandlers.Dispose();
-            this.dalamud.Dispose();
+            PluginInterface.Dispose();
         }
 
 
-        public void Initialize(DalamudPluginInterface pluginInterface)
+        public Plugin()
         {
             _instance = this;
             
-            this.dalamud = pluginInterface;
+            
 
-            if (this.dalamud != null)
-                this.configuration = this.dalamud.GetPluginConfig() as Configuration ?? new Configuration();    
+            if (PluginInterface != null)
+                this.configuration = PluginInterface.GetPluginConfig() as Configuration ?? new Configuration();    
             else
                 this.configuration = new Configuration();
             
-            this.configuration.Initialize(this.dalamud);
+            this.configuration.Initialize(PluginInterface);
             
             this.ui = new PluginUI();
             
@@ -147,7 +166,7 @@
         /// </summary>
         private void RegisterCommandHooks()
         {
-            this.dalamud.CommandManager.AddHandler(
+            CommandManager.AddHandler(
                 mainCommandName,
                 new CommandInfo(OnCommand)
                     { 
@@ -158,7 +177,7 @@
 
         private void RegisterHooks()
         {
-            if (this.dalamud == null)
+            if (PluginInterface == null)
                 return;
             
             RegisterCommandHooks();
@@ -169,16 +188,16 @@
 
         private void RegisterStartupHooks()
         {
-            this.dalamud.ClientState.OnLogin += this.startupHandlers.OnLogin;
-            this.dalamud.ClientState.OnLogout += this.startupHandlers.OnLogout;
+            ClientState.Login += this.startupHandlers.OnLogin;
+            ClientState.Logout += this.startupHandlers.OnLogout;
         }
 
 
         private void RegisterUIHooks()
         {
-            this.dalamud.UiBuilder.OnBuildUi += this.ui.Draw;
-            this.dalamud.UiBuilder.OnOpenConfigUi +=
-                (sender, args) =>
+            PluginInterface.UiBuilder.Draw += this.ui.Draw;
+            PluginInterface.UiBuilder.OpenConfigUi +=
+                () =>
                     {
                         this.ui.ConfigWindow.Show();
                     };

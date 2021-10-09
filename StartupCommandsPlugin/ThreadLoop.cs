@@ -18,7 +18,7 @@ namespace FfxivStartupCommands
                                             cancellationTokenSource = new CancellationTokenSource()
                                         };
 
-            threadLoop.task = Task.Run(action: () =>
+            threadLoop.task = Task.Factory.StartNew(action: () =>
                 {
                     while (!threadLoop.cancellationTokenSource.IsCancellationRequested)
                     {
