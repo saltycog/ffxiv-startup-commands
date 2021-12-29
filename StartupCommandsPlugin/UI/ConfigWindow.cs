@@ -15,7 +15,11 @@ namespace FfxivStartupCommands
         {
             get
             {
-                float flexHeight = 27 * Plugin.Configuration.CustomCommands.Count;
+                int customCommandCount = Plugin.Configuration.CustomCommands != null
+                                             ? Plugin.Configuration.CustomCommands.Count
+                                             : 0;
+                
+                float flexHeight = 27 * customCommandCount;
 
                 float newWidth = MinimumWindowWidth;
                 float newHeight = MinimumWindowHeight + flexHeight;
@@ -83,7 +87,7 @@ namespace FfxivStartupCommands
             ImGui.SameLine();
             if (ImGui.Button("Add"))
             {
-                Plugin.Configuration.CustomCommands.Add(new Configuration.CustomCommand());
+                Plugin.Configuration.CustomCommands.Add(new CharacterConfiguration.CustomCommand());
             }
             if (ImGui.IsItemHovered())
             {
@@ -91,9 +95,9 @@ namespace FfxivStartupCommands
             }
 
             bool updated = false;
-            Configuration.CustomCommand commandToRemove = null;
+            CharacterConfiguration.CustomCommand commandToRemove = null;
             int index = 0;
-            foreach (Configuration.CustomCommand customCommand in Plugin.Configuration.CustomCommands)
+            foreach (CharacterConfiguration.CustomCommand customCommand in Plugin.Configuration.CustomCommands)
             {
                 string currentChatCommand = customCommand.Command;
                 ImGui.Bullet();
@@ -140,11 +144,11 @@ namespace FfxivStartupCommands
                     if (selected)
                     {
                         ImGui.SetItemDefaultFocus();
-                        Plugin.Configuration.Save();
                     }
                 }
 
                 ImGui.EndCombo();
+                Plugin.Configuration.Save();
             }
 
             if (ImGui.IsItemHovered())

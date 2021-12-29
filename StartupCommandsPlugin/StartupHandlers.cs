@@ -88,7 +88,7 @@ namespace FfxivStartupCommands
             if (!Plugin.Configuration.HasCommands)
                 return;
             
-            Plugin.LogToChat("Performing startup behaviors.");
+            Plugin.LogToChat($"Performing startup behaviors for {Plugin.Configuration.CurrentCharacter}.");
             
             Plugin.GameClient.ChangeChatChannel();
             RunCustomCommands();
@@ -97,7 +97,7 @@ namespace FfxivStartupCommands
 
         private static void RunCustomCommands()
         {
-            foreach (Configuration.CustomCommand customCommand in Plugin.Configuration.CustomCommands)
+            foreach (CharacterConfiguration.CustomCommand customCommand in Plugin.Configuration.CustomCommands)
             {
                 Plugin.GameClient.SubmitToChat(customCommand.Command);
             }
@@ -106,6 +106,7 @@ namespace FfxivStartupCommands
 
         private void OnChatReady()
         {
+            Plugin.Configuration.SetCurrentCharacter(Plugin.ClientState.LocalPlayer.Name.ToString());
             RunStartupBehaviors();
         }
     }

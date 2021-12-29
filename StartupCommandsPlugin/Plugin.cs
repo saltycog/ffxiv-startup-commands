@@ -148,6 +148,9 @@
             this.gameClient = new GameClient();
 
             RegisterHooks();
+            
+            if (ClientState.LocalPlayer != null)
+                Plugin.Configuration.SetCurrentCharacter(Plugin.ClientState.LocalPlayer.Name.ToString());
         }
 
 
@@ -199,6 +202,14 @@
             PluginInterface.UiBuilder.OpenConfigUi +=
                 () =>
                     {
+                        if (ClientState.LocalPlayer == null)
+                            return;
+
+                        if (Configuration.CurrentCharacter == null)
+                        {
+                            Configuration.SetCurrentCharacter(ClientState.LocalPlayer.Name.ToString());
+                        }
+                        
                         this.ui.ConfigWindow.Show();
                     };
         }
