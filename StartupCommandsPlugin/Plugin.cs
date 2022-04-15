@@ -125,7 +125,7 @@
             
             this.ui.Dispose();
             this.startupHandlers.Dispose();
-            PluginInterface.Dispose();
+            //PluginInterface.Dispose();
         }
 
 
