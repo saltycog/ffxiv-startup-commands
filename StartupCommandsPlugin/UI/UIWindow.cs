@@ -16,10 +16,6 @@ namespace FfxivStartupCommands
             set { this.isVisible = value; }
         }
 
-        public virtual Vector2 WindowSize { get; set; } = new Vector2(0, 0);
-
-        protected abstract ImGuiWindowFlags WindowFlags { get; }
-
         protected abstract string WindowTitle { get; }
         #endregion
 
@@ -32,11 +28,10 @@ namespace FfxivStartupCommands
             if (!this.IsVisible)
                 return;
 
-            ImGui.SetNextWindowSize(this.WindowSize, ImGuiCond.Always);
+            ImGui.SetNextWindowSize(new Vector2(520, 480), ImGuiCond.FirstUseEver);
             if (ImGui.Begin(
                 this.WindowTitle,
-                ref this.isVisible, 
-                this.WindowFlags))
+                ref this.isVisible))
             {
                 OnDraw();
             }
