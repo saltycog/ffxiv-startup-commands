@@ -7,36 +7,7 @@ namespace FfxivStartupCommands
 
     public class ConfigWindow : UIWindow
     {
-        private const float MinimumWindowWidth = 450;
-        private const float MinimumWindowHeight = 170;
-        
         #region Properties
-        public override Vector2 WindowSize
-        {
-            get
-            {
-                int customCommandCount = Plugin.Configuration.CustomCommands != null
-                                             ? Plugin.Configuration.CustomCommands.Count
-                                             : 0;
-                
-                float flexHeight = 27 * customCommandCount;
-
-                float newWidth = MinimumWindowWidth;
-                float newHeight = MinimumWindowHeight + flexHeight;
-
-                return new Vector2(newWidth, newHeight);
-            }
-        }
-
-
-
-        protected override ImGuiWindowFlags WindowFlags { get; } =
-            ImGuiWindowFlags.NoScrollbar 
-            | ImGuiWindowFlags.NoScrollWithMouse
-            | ImGuiWindowFlags.NoCollapse
-            | ImGuiWindowFlags.NoResize;
-
-
         protected override string WindowTitle { get; } = "Startup Commands Configuration";
         #endregion
 
@@ -47,18 +18,9 @@ namespace FfxivStartupCommands
             
             DrawChatChannelSelection();
 
-            ImGui.Spacing();
-            ImGui.Spacing();
-
             DrawCustomCommands();
 
-            ImGui.NewLine();
-            ImGui.NewLine();
-
             DrawExecuteButton();
-            
-            ImGui.SameLine(this.WindowSize.X - 146);
-            
         }
 
 
@@ -102,7 +64,6 @@ namespace FfxivStartupCommands
                 string currentChatCommand = customCommand.Command;
                 ImGui.Bullet();
                 ImGui.SameLine();
-                ImGui.PushItemWidth(this.WindowSize.X - 105);
 
                 updated = ImGui.InputText($"###inputText_Command_{index}", ref currentChatCommand, 512);
 
