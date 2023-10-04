@@ -50,7 +50,7 @@ namespace FfxivStartupCommands
         /// <summary>
         /// Executed upon successful character login.
         /// </summary>
-        public unsafe void OnLogin(object sender, EventArgs args)
+        public unsafe void OnLogin()
         {
             if (this.chatReady
                 || this.WaitingForChatThread != null)
@@ -72,7 +72,7 @@ namespace FfxivStartupCommands
         }
 
 
-        public void OnLogout(object sender, EventArgs args)
+        public void OnLogout()
         {
             this.chatReady = false;
             if (this.WaitingForChatThread != null)

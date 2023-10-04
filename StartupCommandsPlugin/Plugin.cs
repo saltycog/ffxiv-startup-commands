@@ -6,6 +6,7 @@
     using Dalamud.Game.Gui;
     using Dalamud.IoC;
     using Dalamud.Plugin;
+    using Dalamud.Plugin.Services;
 
 
     /// <summary>
@@ -22,22 +23,22 @@
         public static DalamudPluginInterface PluginInterface { get; private set; }
         
         [PluginService]
-        public static CommandManager CommandManager { get; private set; }
+        public static ICommandManager CommandManager { get; private set; }
         
         [PluginService]
-        public static ClientState ClientState { get; private set; }
+        public static IClientState ClientState { get; private set; }
         
         [PluginService]
-        public static Framework Framework { get; private set; }
+        public static IFramework Framework { get; private set; }
         
         [PluginService]
-        public static ChatGui ChatGui { get; private set; }
+        public static IChatGui ChatGui { get; private set; }
         
         [PluginService]
-        public static GameGui GameGui { get; private set; }
+        public static IGameGui GameGui { get; private set; }
         
         [PluginService]
-        public static SigScanner TargetModuleScanner { get; private set; }
+        public static ISigScanner TargetModuleScanner { get; private set; }
         
         private Configuration configuration = new Configuration();
         private GameClient gameClient;
