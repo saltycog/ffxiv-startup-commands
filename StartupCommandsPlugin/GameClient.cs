@@ -2,6 +2,7 @@ namespace FfxivStartupCommands
 {
     using System;
     using System.Runtime.InteropServices;
+    using FFXIVClientStructs.FFXIV.Client.UI;
     using FFXIVClientStructs.FFXIV.Component.GUI;
 
 
@@ -17,16 +18,11 @@ namespace FfxivStartupCommands
         
         public GameClient()
         {
-            if (Plugin.PluginInterface == null)
+            if (Services.PluginInterface == null)
                 return;
             
-            // Get UI module.
-            IntPtr getUiModulePointer = Plugin.TargetModuleScanner.ScanText("E8 ?? ?? ?? ?? 48 83 7F ?? 00 48 8B F0");
-            this.uiModulePointer = Plugin.TargetModuleScanner.GetStaticAddressFromSig("48 8B 0D ?? ?? ?? ?? 48 8D 54 24 ?? 48 83 C1 10 E8 ?? ?? ?? ??");
-            this.getUI = Marshal.GetDelegateForFunctionPointer<GetUiModuleDelegate>(getUiModulePointer);
-            
             // Get chat box module.
-            IntPtr chatBoxModulePointer = Plugin.TargetModuleScanner.ScanText("48 89 5C 24 ?? 57 48 83 EC 20 48 8B FA 48 8B D9 45 84 C9");
+            IntPtr chatBoxModulePointer = Services.TargetModuleScanner.ScanText("48 89 5C 24 ?? 57 48 83 EC 20 48 8B FA 48 8B D9 45 84 C9");
             this.getChatBox = Marshal.GetDelegateForFunctionPointer<GetChatBoxModuleDelegate>(chatBoxModulePointer);
         }
 
@@ -36,9 +32,9 @@ namespace FfxivStartupCommands
         /// </summary>
         public unsafe bool GetChatVisible()
         {
-            if (Plugin.ClientState.LocalPlayer != null)
+            if (Services.ClientState.LocalPlayer != null)
             {
-                AtkUnitBase* chatLog = (AtkUnitBase*)Plugin.GameGui.GetAddonByName("ChatLog", 1);
+                AtkUnitBase* chatLog = (AtkUnitBase*)Services.GameGui.GetAddonByName("ChatLog", 1);
                 
                 if (chatLog != null)
                     return chatLog->IsVisible;
@@ -65,17 +61,14 @@ namespace FfxivStartupCommands
         /// Can be used to enter chat commands.
         /// </summary>
         /// <param name="text">Text to submit.</param>
-        public void SubmitToChat(string text) 
+        public unsafe void SubmitToChat(string text)
         {
-            IntPtr uiModule = this.getUI(Marshal.ReadIntPtr(this.uiModulePointer));
-
+            nint uiModule = (nint)UIModule.Instance();
             using (ChatPayload payload = new ChatPayload(text))
             {
                 IntPtr mem1 = Marshal.AllocHGlobal(400);
                 Marshal.StructureToPtr(payload, mem1, false);
-
                 this.getChatBox(uiModule, mem1, IntPtr.Zero, 0);
-
                 Marshal.FreeHGlobal(mem1);    
             }
         }

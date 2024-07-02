@@ -1,12 +1,7 @@
 ﻿namespace FfxivStartupCommands
 {
-    using Dalamud.Game;
-    using Dalamud.Game.ClientState;
     using Dalamud.Game.Command;
-    using Dalamud.Game.Gui;
-    using Dalamud.IoC;
     using Dalamud.Plugin;
-    using Dalamud.Plugin.Services;
 
 
     /// <summary>
@@ -19,34 +14,11 @@
 
         private static Plugin _instance;
 
-        [PluginService]
-        public static DalamudPluginInterface PluginInterface { get; private set; }
-        
-        [PluginService]
-        public static ICommandManager CommandManager { get; private set; }
-        
-        [PluginService]
-        public static IClientState ClientState { get; private set; }
-        
-        [PluginService]
-        public static IFramework Framework { get; private set; }
-        
-        [PluginService]
-        public static IChatGui ChatGui { get; private set; }
-        
-        [PluginService]
-        public static IGameGui GameGui { get; private set; }
-        
-        [PluginService]
-        public static ISigScanner TargetModuleScanner { get; private set; }
-        
         private Configuration configuration = new Configuration();
         private GameClient gameClient;
         private StartupHandlers startupHandlers;
         private PluginUI ui;
 
-
-        #region Properties
         /// <summary>
         /// Plugin configuration.
         /// </summary>
@@ -54,8 +26,6 @@
         {
             get { return Instance.configuration; }
         }
-
-        
 
         /// <summary>
         /// Game client utility functions.
@@ -96,52 +66,23 @@
         {
             get
             {
-                if (_instance == null)
-                {
-                    _instance = new Plugin();
-                }
                 return _instance;
             }
         }
-        #endregion
 
 
-        /// <summary>
-        ///  Log messages directly to in-game chat box.
-        /// </summary>
-        /// <param name="text">Text to display in chat box.</param>
-        public static void LogToChat(string text)
-        {
-            ChatGui.Print(text);
-        }
-
-
-        public void Dispose()
-        {
-            CommandManager.RemoveHandler(mainCommandName);
-            PluginInterface.UiBuilder.Draw -= this.ui.Draw;
-            
-            ClientState.Login -= this.startupHandlers.OnLogin;
-            ClientState.Logout -= this.startupHandlers.OnLogout;
-            
-            this.ui.Dispose();
-            this.startupHandlers.Dispose();
-            //PluginInterface.Dispose();
-        }
-
-
-        public Plugin()
+        public Plugin(IDalamudPluginInterface dalamudPluginInterface)
         {
             _instance = this;
-            
-            
 
-            if (PluginInterface != null)
-                this.configuration = PluginInterface.GetPluginConfig() as Configuration ?? new Configuration();    
+            Services.Initialize(dalamudPluginInterface);
+            
+            if (Services.PluginInterface != null)
+                this.configuration = Services.PluginInterface.GetPluginConfig() as Configuration ?? new Configuration();    
             else
                 this.configuration = new Configuration();
             
-            this.configuration.Initialize(PluginInterface);
+            this.configuration.Initialize(Services.PluginInterface);
             
             this.ui = new PluginUI();
             
@@ -150,8 +91,32 @@
 
             RegisterHooks();
             
-            if (ClientState.LocalPlayer != null)
-                Plugin.Configuration.SetCurrentCharacter(Plugin.ClientState.LocalPlayer.Name.ToString());
+            if (Services.ClientState.LocalPlayer != null)
+                Configuration.SetCurrentCharacter(Services.ClientState.LocalPlayer.Name.ToString());
+        }
+
+
+        /// <summary>
+        ///  Log messages directly to in-game chat box.
+        /// </summary>
+        /// <param name="text">Text to display in chat box.</param>
+        public static void LogToChat(string text)
+        {
+            Services.ChatGui.Print(text);
+        }
+
+
+        public void Dispose()
+        {
+            Services.CommandManager.RemoveHandler(mainCommandName);
+            Services.PluginInterface.UiBuilder.Draw -= this.ui.Draw;
+
+            Services.ClientState.Login -= this.startupHandlers.OnLogin;
+            Services.ClientState.Logout -= this.startupHandlers.OnLogout;
+            
+            this.ui.Dispose();
+            this.startupHandlers.Dispose();
+            //PluginInterface.Dispose();
         }
 
 
@@ -170,7 +135,7 @@
         /// </summary>
         private void RegisterCommandHooks()
         {
-            CommandManager.AddHandler(
+            Services.CommandManager.AddHandler(
                 mainCommandName,
                 new CommandInfo(OnCommand)
                     { 
@@ -181,7 +146,7 @@
 
         private void RegisterHooks()
         {
-            if (PluginInterface == null)
+            if (Services.PluginInterface == null)
                 return;
             
             RegisterCommandHooks();
@@ -192,23 +157,23 @@
 
         private void RegisterStartupHooks()
         {
-            ClientState.Login += this.startupHandlers.OnLogin;
-            ClientState.Logout += this.startupHandlers.OnLogout;
+            Services.ClientState.Login += this.startupHandlers.OnLogin;
+            Services.ClientState.Logout += this.startupHandlers.OnLogout;
         }
 
 
         private void RegisterUIHooks()
         {
-            PluginInterface.UiBuilder.Draw += this.ui.Draw;
-            PluginInterface.UiBuilder.OpenConfigUi +=
+            Services.PluginInterface.UiBuilder.Draw += this.ui.Draw;
+            Services.PluginInterface.UiBuilder.OpenConfigUi +=
                 () =>
                     {
-                        if (ClientState.LocalPlayer == null)
+                        if (Services.ClientState.LocalPlayer == null)
                             return;
 
                         if (Configuration.CurrentCharacter == null)
                         {
-                            Configuration.SetCurrentCharacter(ClientState.LocalPlayer.Name.ToString());
+                            Configuration.SetCurrentCharacter(Services.ClientState.LocalPlayer.Name.ToString());
                         }
                         
                         this.ui.ConfigWindow.Show();

@@ -10,13 +10,11 @@
     public class Configuration : IPluginConfiguration
     {
         [NonSerialized]
-        private DalamudPluginInterface pluginInterface;
+        private IDalamudPluginInterface pluginInterface;
 
         [NonSerialized]
         private string currentCharacter;
 
-
-        #region Properties
         public Dictionary<string, CharacterConfiguration> CharacterConfigurations { get; set; } =
             new Dictionary<string, CharacterConfiguration>();
 
@@ -74,10 +72,9 @@
         }
 
         public int Version { get; set; } = 1;
-        #endregion
 
 
-        public void Initialize(DalamudPluginInterface pluginInterface)
+        public void Initialize(IDalamudPluginInterface pluginInterface)
         {
             this.pluginInterface = pluginInterface;
         }
