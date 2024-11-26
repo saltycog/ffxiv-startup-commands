@@ -72,7 +72,7 @@ namespace FfxivStartupCommands
         }
 
 
-        public void OnLogout()
+        public void OnLogout(int type, int code)
         {
             this.chatReady = false;
             if (this.WaitingForChatThread != null)
